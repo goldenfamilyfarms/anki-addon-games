@@ -1,0 +1,21 @@
+# Core dependencies
+PyQt6==6.6.1
+PyQt6-Qt6==6.6.1
+Pillow==10.4.0
+
+# Anki (provided by Anki installation)
+# aqt>=2.1.66
+# anki>=2.1.66
+
+# Development dependencies (in requirements-dev.txt)# Testing
+pytest==8.0.0
+pytest-qt==4.3.1
+pytest-cov==4.1.0
+
+# Code quality
+black==24.1.1
+ruff==0.1.15
+mypy==1.8.0
+
+# Build tools
+pyinstaller==6.18.0
