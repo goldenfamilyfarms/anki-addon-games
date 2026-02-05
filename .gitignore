@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+
+# PyQt
+*.ui
+*.qrc
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Anki
+*.anki2
+*.anki21
+collection.anki2
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Backups
+backups/
+saves/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build
+build/
+dist/
+*.egg-info/
