@@ -11,7 +11,7 @@ Requirements tested: 7.6, 7.7
 """
 
 import pytest
-from unittest.mock import MagicMock, call
+from unittest.mock import MagicMock
 
 from integration.menu_integration import (
     MenuIntegration,
@@ -115,8 +115,8 @@ class TestMockAnkiMenuProvider:
         assert mock_menu_provider.has_menu_item("Tools", "Test Item")
         items = mock_menu_provider.get_menu_items("Tools")
         assert len(items) == 1
-        assert items[0]["text"] == "Test Item"
-
+        assert items[0]['text'] == "Test Item"
+    
     def test_remove_menu_item(self, mock_menu_provider):
         """Test that menu items can be removed."""
         callback = MagicMock()
@@ -159,7 +159,7 @@ class TestMockAnkiMenuProvider:
         assert mock_menu_provider.has_toolbar_button("main", "Test Button")
         buttons = mock_menu_provider.get_toolbar_buttons("main")
         assert len(buttons) == 1
-        assert buttons[0]["text"] == "Test Button"
+        assert buttons[0]['text'] == "Test Button"
     
     def test_remove_toolbar_button(self, mock_menu_provider):
         """Test that toolbar buttons can be removed."""
@@ -522,7 +522,7 @@ class TestMenuIntegrationSetupToolbar:
         
         buttons = mock_menu_provider.get_toolbar_buttons("main")
         assert len(buttons) == 1
-        assert buttons[0]["tooltip"] == MenuIntegration.TOOLBAR_GAME_WINDOW_TOOLTIP
+        assert buttons[0]['tooltip'] == MenuIntegration.TOOLBAR_GAME_WINDOW_TOOLTIP
 
 
 # ============================================================================
@@ -617,7 +617,7 @@ class TestMenuIntegrationSetupTeardown:
         menu_integration,
         mock_menu_provider
     ):
-        """Test that calling setup_menu twice does not duplicate items."""
+        """Test that calling setup_menu twice doesn't duplicate items."""
         menu_integration.setup_menu()
         menu_integration.setup_toolbar()  # This sets _setup_complete
         
@@ -638,10 +638,7 @@ class TestMenuIntegrationCallableSupport:
     
     def test_callable_dashboard_is_called(self, mock_menu_provider):
         """Test that a callable dashboard is called when menu item triggered."""
-        # Use a simple function instead of MagicMock to avoid hasattr('show') returning True
-        call_count = [0]
-        def dashboard_callback():
-            call_count[0] += 1
+        dashboard_callback = MagicMock()
         
         integration = MenuIntegration(
             dashboard=dashboard_callback,
@@ -656,14 +653,11 @@ class TestMenuIntegrationCallableSupport:
             MenuIntegration.MENU_DASHBOARD
         )
         
-        assert call_count[0] == 1
+        dashboard_callback.assert_called_once()
     
     def test_callable_game_window_is_called(self, mock_menu_provider):
         """Test that a callable game window is called when triggered."""
-        # Use a simple function instead of MagicMock to avoid hasattr('show') returning True
-        call_count = [0]
-        def game_window_callback():
-            call_count[0] += 1
+        game_window_callback = MagicMock()
         
         integration = MenuIntegration(
             dashboard=None,
@@ -678,14 +672,11 @@ class TestMenuIntegrationCallableSupport:
             MenuIntegration.TOOLBAR_GAME_WINDOW
         )
         
-        assert call_count[0] == 1
+        game_window_callback.assert_called_once()
     
     def test_callable_settings_is_called(self, mock_menu_provider):
         """Test that a callable settings panel is called when triggered."""
-        # Use a simple function instead of MagicMock to avoid hasattr('show') returning True
-        call_count = [0]
-        def settings_callback():
-            call_count[0] += 1
+        settings_callback = MagicMock()
         
         integration = MenuIntegration(
             dashboard=None,
@@ -700,7 +691,382 @@ class TestMenuIntegrationCallableSupport:
             MenuIntegration.MENU_SETTINGS
         )
         
-        assert call_count[0] == 1
+        settings_callback.assert_called_once()
+
+
+# ============================================================================
+# MenuIntegration Tests - Error Handling
+# ============================================================================
+
+class TestMenuIntegrationErrorHandling:
+    """Tests for MenuIntegration error handling."""
+    
+    def test_dashboard_error_is_caught(self, mock_menu_provider):
+        """Test that errors in dashboard.show() are caught."""
+        dashboard = MagicMock()
+        dashboard.show.side_effect = Exception("Dashboard error")
+        
+        integration = MenuIntegration(
+            dashboard=dashboard,
+            game_window=None,
+            settings_panel=None,
+            menu_provider=mock_menu_provider
+        )
+        
+        integration.setup_menu()
+        
+        # Should not raise
+        mock_menu_provider.trigger_menu_item(
+            "Tools",
+            MenuIntegration.MENU_DASHBOARD
+        )
+    
+    def test_game_window_error_is_caught(self, mock_menu_provider):
+        """Test that errors in game_window.show() are caught."""
+        game_window = MagicMock()
+        game_window.show.side_effect = Exception("Game window error")
+        
+        integration = MenuIntegration(
+            dashboard=None,
+            game_window=game_window,
+            settings_panel=None,
+            menu_provider=mock_menu_provider
+        )
+        
+        integration.setup_toolbar()
+        
+        # Should not raise
+        mock_menu_provider.trigger_toolbar_button(
+            "main",
+            MenuIntegration.TOOLBAR_GAME_WINDOW
+        )
+    
+    def test_settings_error_is_caught(self, mock_menu_provider):
+        """Test that errors in settings_panel.show() are caught."""
+        settings = MagicMock()
+        settings.show.side_effect = Exception("Settings error")
+        
+        integration = MenuIntegration(
+            dashboard=None,
+            game_window=None,
+            settings_panel=settings,
+            menu_provider=mock_menu_provider
+        )
+        
+        integration.setup_menu()
+        
+        # Should not raise
+        mock_menu_provider.trigger_menu_item(
+            "Tools",
+            MenuIntegration.MENU_SETTINGS
+        )
+
+
+# ============================================================================
+# Integration Tests
+# ============================================================================
+
+class TestMenuIntegrationIntegration:
+    """Integration tests for MenuIntegration."""
+    
+    def test_full_workflow(
+        self,
+        mock_dashboard,
+        mock_game_window,
+        mock_settings_panel,
+        mock_menu_provider
+    ):
+        """Test the full workflow: setup, use, teardown."""
+        # Create integration
+        integration = MenuIntegration(
+            dashboard=mock_dashboard,
+            game_window=mock_game_window,
+            settings_panel=mock_settings_panel,
+            menu_provider=mock_menu_provider
+        )
+        
+        # Setup
+        integration.setup()
+        assert integration.is_setup is True
+        assert integration.menu_action_count == 3
+        assert integration.toolbar_action_count == 1
+        
+        # Use menu items
+        mock_menu_provider.trigger_menu_item("Tools", MenuIntegration.MENU_DASHBOARD)
+        mock_dashboard.show.assert_called_once()
+        
+        mock_menu_provider.trigger_menu_item("Tools", MenuIntegration.MENU_GAME_WINDOW)
+        mock_game_window.show.assert_called_once()
+        
+        mock_menu_provider.trigger_menu_item("Tools", MenuIntegration.MENU_SETTINGS)
+        mock_settings_panel.show.assert_called_once()
+        
+        # Use toolbar button
+        mock_menu_provider.trigger_toolbar_button("main", MenuIntegration.TOOLBAR_GAME_WINDOW)
+        assert mock_game_window.show.call_count == 2  # Called twice now
+        
+        # Teardown
+        integration.teardown()
+        assert integration.is_setup is False
+        assert integration.menu_action_count == 0
+        assert integration.toolbar_action_count == 0
+        assert len(mock_menu_provider.get_menu_items("Tools")) == 0
+        assert len(mock_menu_provider.get_toolbar_buttons("main")) == 0
+
+
+
+# ============================================================================
+# MenuIntegration Tests - Setup Toolbar (Requirement 7.7)
+# ============================================================================
+
+class TestMenuIntegrationSetupToolbar:
+    """Tests for MenuIntegration.setup_toolbar() - Requirement 7.7."""
+    
+    def test_setup_toolbar_adds_game_window_button(
+        self,
+        menu_integration,
+        mock_menu_provider
+    ):
+        """Test that setup_toolbar adds Game Window button to toolbar.
+        
+        Validates: Requirement 7.7 - Add toolbar button for Game Window
+        """
+        menu_integration.setup_toolbar()
+        
+        assert mock_menu_provider.has_toolbar_button(
+            "main",
+            MenuIntegration.TOOLBAR_GAME_WINDOW
+        )
+    
+    def test_setup_toolbar_creates_one_action(
+        self,
+        menu_integration,
+        mock_menu_provider
+    ):
+        """Test that setup_toolbar creates one toolbar action."""
+        menu_integration.setup_toolbar()
+        
+        buttons = mock_menu_provider.get_toolbar_buttons("main")
+        assert len(buttons) == 1
+    
+    def test_setup_toolbar_without_game_window_adds_nothing(
+        self,
+        mock_dashboard,
+        mock_settings_panel,
+        mock_menu_provider
+    ):
+        """Test that setup_toolbar adds nothing if no game window provided."""
+        integration = MenuIntegration(
+            dashboard=mock_dashboard,
+            game_window=None,
+            settings_panel=mock_settings_panel,
+            menu_provider=mock_menu_provider
+        )
+        
+        integration.setup_toolbar()
+        
+        buttons = mock_menu_provider.get_toolbar_buttons("main")
+        assert len(buttons) == 0
+    
+    def test_toolbar_button_opens_game_window(
+        self,
+        menu_integration,
+        mock_menu_provider,
+        mock_game_window
+    ):
+        """Test that clicking toolbar button opens the game window.
+        
+        Validates: Requirement 7.7 - Toolbar button provides quick access to Game Window
+        """
+        menu_integration.setup_toolbar()
+        
+        mock_menu_provider.trigger_toolbar_button(
+            "main",
+            MenuIntegration.TOOLBAR_GAME_WINDOW
+        )
+        
+        mock_game_window.show.assert_called_once()
+    
+    def test_toolbar_button_has_tooltip(
+        self,
+        menu_integration,
+        mock_menu_provider
+    ):
+        """Test that toolbar button has a tooltip."""
+        menu_integration.setup_toolbar()
+        
+        buttons = mock_menu_provider.get_toolbar_buttons("main")
+        assert len(buttons) == 1
+        assert buttons[0]['tooltip'] == MenuIntegration.TOOLBAR_GAME_WINDOW_TOOLTIP
+
+
+# ============================================================================
+# MenuIntegration Tests - Setup and Teardown
+# ============================================================================
+
+class TestMenuIntegrationSetupTeardown:
+    """Tests for MenuIntegration setup and teardown functionality."""
+    
+    def test_setup_calls_both_setup_methods(
+        self,
+        menu_integration,
+        mock_menu_provider
+    ):
+        """Test that setup() calls both setup_menu() and setup_toolbar()."""
+        menu_integration.setup()
+        
+        # Should have menu items
+        items = mock_menu_provider.get_menu_items("Tools")
+        assert len(items) == 3
+        
+        # Should have toolbar button
+        buttons = mock_menu_provider.get_toolbar_buttons("main")
+        assert len(buttons) == 1
+    
+    def test_is_setup_property(self, menu_integration):
+        """Test the is_setup property."""
+        assert menu_integration.is_setup is False
+        
+        menu_integration.setup()
+        
+        assert menu_integration.is_setup is True
+    
+    def test_teardown_removes_menu_items(
+        self,
+        menu_integration,
+        mock_menu_provider
+    ):
+        """Test that teardown removes all menu items."""
+        menu_integration.setup()
+        
+        # Verify items exist
+        assert len(mock_menu_provider.get_menu_items("Tools")) == 3
+        
+        menu_integration.teardown()
+        
+        # Verify items removed
+        assert len(mock_menu_provider.get_menu_items("Tools")) == 0
+    
+    def test_teardown_removes_toolbar_buttons(
+        self,
+        menu_integration,
+        mock_menu_provider
+    ):
+        """Test that teardown removes all toolbar buttons."""
+        menu_integration.setup()
+        
+        # Verify button exists
+        assert len(mock_menu_provider.get_toolbar_buttons("main")) == 1
+        
+        menu_integration.teardown()
+        
+        # Verify button removed
+        assert len(mock_menu_provider.get_toolbar_buttons("main")) == 0
+    
+    def test_teardown_resets_setup_flag(self, menu_integration):
+        """Test that teardown resets the is_setup flag."""
+        menu_integration.setup()
+        assert menu_integration.is_setup is True
+        
+        menu_integration.teardown()
+        assert menu_integration.is_setup is False
+    
+    def test_menu_action_count_property(self, menu_integration):
+        """Test the menu_action_count property."""
+        assert menu_integration.menu_action_count == 0
+        
+        menu_integration.setup_menu()
+        
+        assert menu_integration.menu_action_count == 3
+    
+    def test_toolbar_action_count_property(self, menu_integration):
+        """Test the toolbar_action_count property."""
+        assert menu_integration.toolbar_action_count == 0
+        
+        menu_integration.setup_toolbar()
+        
+        assert menu_integration.toolbar_action_count == 1
+    
+    def test_double_setup_menu_is_idempotent(
+        self,
+        menu_integration,
+        mock_menu_provider
+    ):
+        """Test that calling setup_menu twice doesn't duplicate items."""
+        menu_integration.setup_menu()
+        menu_integration.setup_toolbar()  # This sets _setup_complete
+        
+        # Try to setup menu again
+        menu_integration.setup_menu()
+        
+        # Should still only have 3 items
+        items = mock_menu_provider.get_menu_items("Tools")
+        assert len(items) == 3
+
+
+# ============================================================================
+# MenuIntegration Tests - Callable Support
+# ============================================================================
+
+class TestMenuIntegrationCallableSupport:
+    """Tests for MenuIntegration with callable UI components."""
+    
+    def test_callable_dashboard_is_called(self, mock_menu_provider):
+        """Test that a callable dashboard is called when menu item triggered."""
+        dashboard_callback = MagicMock()
+        
+        integration = MenuIntegration(
+            dashboard=dashboard_callback,
+            game_window=None,
+            settings_panel=None,
+            menu_provider=mock_menu_provider
+        )
+        
+        integration.setup_menu()
+        mock_menu_provider.trigger_menu_item(
+            "Tools",
+            MenuIntegration.MENU_DASHBOARD
+        )
+        
+        dashboard_callback.assert_called_once()
+    
+    def test_callable_game_window_is_called(self, mock_menu_provider):
+        """Test that a callable game window is called when triggered."""
+        game_window_callback = MagicMock()
+        
+        integration = MenuIntegration(
+            dashboard=None,
+            game_window=game_window_callback,
+            settings_panel=None,
+            menu_provider=mock_menu_provider
+        )
+        
+        integration.setup_toolbar()
+        mock_menu_provider.trigger_toolbar_button(
+            "main",
+            MenuIntegration.TOOLBAR_GAME_WINDOW
+        )
+        
+        game_window_callback.assert_called_once()
+    
+    def test_callable_settings_is_called(self, mock_menu_provider):
+        """Test that a callable settings panel is called when triggered."""
+        settings_callback = MagicMock()
+        
+        integration = MenuIntegration(
+            dashboard=None,
+            game_window=None,
+            settings_panel=settings_callback,
+            menu_provider=mock_menu_provider
+        )
+        
+        integration.setup_menu()
+        mock_menu_provider.trigger_menu_item(
+            "Tools",
+            MenuIntegration.MENU_SETTINGS
+        )
+        
+        settings_callback.assert_called_once()
 
 
 # ============================================================================

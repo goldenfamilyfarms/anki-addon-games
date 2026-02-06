@@ -6,7 +6,7 @@ This implementation plan breaks down the NintendAnki add-on into incremental cod
 
 ## Tasks
 
-- [ ] 1. Set up project foundation and data layer
+- [x] 1. Set up project foundation and data layer
   - [x] 1.1 Create data models and enums
     - Define Theme enum, ReviewResult, ProgressionState, ScoreResult, PenaltyResult dataclasses
     - Define Achievement, PowerUp, Level, Collectible, GameState dataclasses
@@ -44,7 +44,7 @@ This implementation plan breaks down the NintendAnki add-on into incremental cod
 - [x] 2. Checkpoint - Ensure data layer tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 3. Implement core scoring and progression systems
+- [x] 3. Implement core scoring and progression systems
   - [x] 3.1 Implement ScoringEngine
     - Implement calculate_score() with base points and multipliers
     - Implement get_combo_multiplier() with streak tiers (1.0/1.5/2.0/3.0)
@@ -75,8 +75,8 @@ This implementation plan breaks down the NintendAnki add-on into incremental cod
     - **Property 4: Threshold-Based Unlocks**
     - **Validates: Requirements 2.4, 2.5, 13.1**
 
-- [ ] 4. Implement reward and achievement systems
-  - [ ] 4.1 Implement RewardSystem
+- [x] 4. Implement reward and achievement systems
+  - [x] 4.1 Implement RewardSystem
     - Implement add_currency(), spend_currency(), get_balance()
     - Implement get_shop_items() and unlock_item()
     - Define shop items (characters, cosmetics)
@@ -90,7 +90,7 @@ This implementation plan breaks down the NintendAnki add-on into incremental cod
     - **Property 20: Reward Unlocks**
     - **Validates: Requirements 11.4, 11.5, 11.6**
   
-  - [ ] 4.4 Implement AchievementSystem
+  - [x] 4.4 Implement AchievementSystem
     - Define all achievements (cards reviewed, streaks, accuracy, levels, theme-specific)
     - Implement check_achievements() to detect newly unlocked achievements
     - Implement get_all_achievements() and get_progress()
@@ -100,8 +100,8 @@ This implementation plan breaks down the NintendAnki add-on into incremental cod
     - **Property 24: Achievement Tracking and Persistence**
     - **Validates: Requirements 14.1, 14.2, 14.4**
 
-- [ ] 5. Implement power-up and level systems
-  - [ ] 5.1 Implement PowerUpSystem
+- [x] 5. Implement power-up and level systems
+  - [x] 5.1 Implement PowerUpSystem
     - Implement grant_powerup() with theme-appropriate power-ups
     - Implement activate_powerup() and get_active_powerups()
     - Implement get_inventory() and tick() for duration tracking
@@ -111,7 +111,7 @@ This implementation plan breaks down the NintendAnki add-on into incremental cod
     - **Property 23: Power-Up Lifecycle**
     - **Validates: Requirements 13.3, 13.4, 13.6**
   
-  - [ ] 5.3 Implement LevelSystem
+  - [x] 5.3 Implement LevelSystem
     - Implement unlock_level() and complete_level()
     - Implement get_available_levels() and get_level_progress()
     - Define level structures for each theme
@@ -121,11 +121,11 @@ This implementation plan breaks down the NintendAnki add-on into incremental cod
     - **Property 25: Level Tracking and Rewards**
     - **Validates: Requirements 15.2, 15.5, 15.6**
 
-- [ ] 6. Checkpoint - Ensure core systems tests pass
+- [x] 6. Checkpoint - Ensure core systems tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 7. Implement theme management and base theme engine
-  - [ ] 7.1 Implement ThemeManager
+- [x] 7. Implement theme management and base theme engine
+  - [x] 7.1 Implement ThemeManager
     - Implement get_current_theme(), set_theme()
     - Implement get_theme_engine() to return appropriate engine
     - Persist theme selection to database
@@ -139,13 +139,13 @@ This implementation plan breaks down the NintendAnki add-on into incremental cod
     - **Property 2: Theme Selection Round-Trip Persistence**
     - **Validates: Requirements 1.5, 1.6**
   
-  - [ ] 7.4 Implement ThemeEngine abstract base class
+  - [x] 7.4 Implement ThemeEngine abstract base class
     - Define abstract methods for animations, collectibles, level views, stats
     - Create Animation, Collectible, LevelView, ThemeStats dataclasses
     - _Requirements: 4.1, 5.1, 6.1_
 
-- [ ] 8. Implement Mario theme engine
-  - [ ] 8.1 Implement MarioEngine
+- [x] 8. Implement Mario theme engine
+  - [x] 8.1 Implement MarioEngine
     - Implement get_animation_for_correct() (coin collection)
     - Implement get_animation_for_wrong() (damage)
     - Implement get_powerup_for_accuracy() (mushroom/fire flower/star)
@@ -156,8 +156,8 @@ This implementation plan breaks down the NintendAnki add-on into incremental cod
     - **Property 9: Mario Accuracy Rewards**
     - **Validates: Requirements 4.4, 4.5, 4.6**
 
-- [ ] 9. Implement Zelda theme engine
-  - [ ] 9.1 Implement ZeldaEngine
+- [x] 9. Implement Zelda theme engine
+  - [x] 9.1 Implement ZeldaEngine
     - Implement get_animation_for_correct() (exploration)
     - Implement get_animation_for_wrong() (enemy damage)
     - Implement trigger_boss_battle() and complete_boss_battle()
@@ -172,8 +172,8 @@ This implementation plan breaks down the NintendAnki add-on into incremental cod
     - **Property 11: Zelda Item Effects**
     - **Validates: Requirements 5.5, 5.7**
 
-- [ ] 10. Implement DKC theme engine
-  - [ ] 10.1 Implement DKCEngine
+- [x] 10. Implement DKC theme engine
+  - [x] 10.1 Implement DKCEngine
     - Implement get_animation_for_correct() (banana collection)
     - Implement get_animation_for_wrong() (banana loss)
     - Implement start_time_trial() and complete_time_trial()
@@ -192,11 +192,11 @@ This implementation plan breaks down the NintendAnki add-on into incremental cod
     - **Property 8: Theme Animation Selection**
     - **Validates: Requirements 4.2, 4.3, 5.2, 5.3, 6.2, 6.3**
 
-- [ ] 11. Checkpoint - Ensure theme engine tests pass
+- [x] 11. Checkpoint - Ensure theme engine tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 12. Implement Anki integration layer
-  - [ ] 12.1 Implement HookHandler
+- [x] 12. Implement Anki integration layer
+  - [x] 12.1 Implement HookHandler
     - Implement register_hooks() to hook into Anki's reviewer
     - Implement on_card_reviewed() to process review events
     - Implement unregister_hooks() for clean shutdown
@@ -206,27 +206,27 @@ This implementation plan breaks down the NintendAnki add-on into incremental cod
     - **Property 14: Background Progress Tracking**
     - **Validates: Requirements 7.5, 9.6**
   
-  - [ ] 12.3 Implement MenuIntegration
+  - [x] 12.3 Implement MenuIntegration
     - Implement setup_menu() to add Tools menu items
     - Implement setup_toolbar() to add toolbar button
     - _Requirements: 7.6, 7.7_
 
-- [ ] 13. Implement UI layer - Animation Engine
-  - [ ] 13.1 Implement AssetManager
+- [x] 13. Implement UI layer - Animation Engine
+  - [x] 13.1 Implement AssetManager
     - Implement sprite sheet loading and caching
     - Implement asset path resolution for each theme
     - Handle missing assets gracefully with placeholders
     - _Requirements: 4.7, 9.2_
   
-  - [ ] 13.2 Implement AnimationEngine
+  - [x] 13.2 Implement AnimationEngine
     - Implement load_sprite_sheet() and create_animation()
     - Implement play_animation() and stop_animation()
     - Implement set_animation_speed() for customization
     - Target 30+ FPS rendering
     - _Requirements: 9.2, 9.3_
 
-- [ ] 14. Implement UI layer - Game Window
-  - [ ] 14.1 Implement GameWindow
+- [x] 14. Implement UI layer - Game Window
+  - [x] 14.1 Implement GameWindow
     - Create PyQt QMainWindow with game display area
     - Implement show_animation() to play animations
     - Implement update_display() to show current state
@@ -237,7 +237,7 @@ This implementation plan breaks down the NintendAnki add-on into incremental cod
     - **Property 16: Game Window Aspect Ratio Preservation**
     - **Validates: Requirements 9.4**
   
-  - [ ] 14.3 Implement window position persistence
+  - [x] 14.3 Implement window position persistence
     - Implement save_position() and restore_position()
     - Implement minimize_to_tray()
     - _Requirements: 9.5, 9.6, 9.7_
@@ -246,8 +246,8 @@ This implementation plan breaks down the NintendAnki add-on into incremental cod
     - **Property 17: Game Window Position Persistence**
     - **Validates: Requirements 9.5**
 
-- [ ] 15. Implement UI layer - Dashboard
-  - [ ] 15.1 Implement Dashboard
+- [x] 15. Implement UI layer - Dashboard
+  - [x] 15.1 Implement Dashboard
     - Create PyQt QDialog with tabbed interface
     - Implement stats tab (points, cards, streak, accuracy, levels)
     - Implement achievements tab with unlock status and dates
@@ -259,8 +259,8 @@ This implementation plan breaks down the NintendAnki add-on into incremental cod
     - **Property 18: Dashboard Displays Required Information**
     - **Validates: Requirements 10.2, 10.3, 10.4, 10.5**
 
-- [ ] 16. Implement UI layer - Settings Panel
-  - [ ] 16.1 Implement SettingsPanel
+- [x] 16. Implement UI layer - Settings Panel
+  - [x] 16.1 Implement SettingsPanel
     - Create PyQt QDialog with settings categories
     - Implement difficulty settings (points, penalties)
     - Implement reward rate settings (multipliers, thresholds)
@@ -272,59 +272,59 @@ This implementation plan breaks down the NintendAnki add-on into incremental cod
     - **Property 21: Stats-Only Mode Disables Animations**
     - **Validates: Requirements 12.4**
 
-- [ ] 17. Checkpoint - Ensure UI tests pass
+- [x] 17. Checkpoint - Ensure UI tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 18. Wire all components together
-  - [ ] 18.1 Create main add-on entry point
+- [x] 18. Wire all components together
+  - [x] 18.1 Create main add-on entry point
     - Initialize all managers and systems
     - Wire dependencies between components
     - Register Anki hooks on add-on load
     - _Requirements: 7.1, 7.2_
   
-  - [ ] 18.2 Implement event flow from review to UI
+  - [x] 18.2 Implement event flow from review to UI
     - Connect HookHandler to ProgressionSystem and ScoringEngine
     - Connect ProgressionSystem to ThemeManager
     - Connect ThemeManager to GameWindow
     - _Requirements: 7.2, 7.4_
   
-  - [ ] 18.3 Implement real-time dashboard updates
+  - [x] 18.3 Implement real-time dashboard updates
     - Connect review events to Dashboard refresh
     - _Requirements: 10.7_
 
-- [ ] 19. Create placeholder assets
-  - [ ] 19.1 Create placeholder sprites for Mario theme
+- [x] 19. Create placeholder assets
+  - [x] 19.1 Create placeholder sprites for Mario theme
     - Character sprites (idle, run, jump, damage)
     - Item sprites (coin, mushroom, fire flower, star)
     - Background tiles
     - _Requirements: 4.7_
   
-  - [ ] 19.2 Create placeholder sprites for Zelda theme
+  - [x] 19.2 Create placeholder sprites for Zelda theme
     - Character sprites (idle, walk, attack, damage)
     - Item sprites (heart, sword, shield, key)
     - Map tiles
     - _Requirements: 5.8_
   
-  - [ ] 19.3 Create placeholder sprites for DKC theme
+  - [x] 19.3 Create placeholder sprites for DKC theme
     - Character sprites (idle, run, collect, damage)
     - Collectible sprites (banana, barrel)
     - Jungle background tiles
     - _Requirements: 6.1_
 
-- [ ] 20. Final integration and polish
-  - [ ] 20.1 Write integration tests
+- [x] 20. Final integration and polish
+  - [x] 20.1 Write integration tests
     - Test full review cycle with all themes
     - Test theme switching during session
     - Test add-on load/unload cycle
     - _Requirements: 1.3, 7.3_
   
-  - [ ] 20.2 Create Anki add-on manifest
+  - [x] 20.2 Create Anki add-on manifest
     - Create manifest.json with add-on metadata
     - Create __init__.py entry point
     - Package for Anki add-on distribution
     - _Requirements: 7.1_
 
-- [ ] 21. Final checkpoint - Ensure all tests pass
+- [x] 21. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes

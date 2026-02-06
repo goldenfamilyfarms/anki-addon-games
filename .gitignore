@@ -37,6 +37,8 @@ collection.anki2
 backups/
 saves/
 
+.kiro/
+.kiro
 # OS
 .DS_Store
 Thumbs.db

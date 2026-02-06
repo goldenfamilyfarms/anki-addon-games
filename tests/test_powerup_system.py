@@ -149,7 +149,7 @@ class TestActivatePowerup:
         assert len(active) == 1
         assert active[0].powerup.type == PowerUpType.FIRE_FLOWER
         assert active[0].remaining_seconds == 60.0
-    
+
     def test_activate_instant_powerup_not_added_to_active_list(self, powerup_system):
         """Activating an instant power-up should not add it to active power-ups."""
         # Mushroom has duration_seconds = 0 (instant)
@@ -391,3 +391,98 @@ class TestPersistence:
         
         assert len(inventory) == 1
         assert inventory[0].quantity == 1
+
+
+class TestEdgeCases:
+    """Tests for edge cases and boundary conditions."""
+    
+    def test_tick_with_zero_delta_time(self, powerup_system):
+        """Tick with zero delta time should not change remaining time."""
+        powerup = powerup_system.grant_powerup(PowerUpType.FIRE_FLOWER, Theme.MARIO)
+        powerup_system.activate_powerup(powerup.id)
+        
+        powerup_system.tick(0.0)
+        
+        active = powerup_system.get_active_powerups()
+        assert active[0].remaining_seconds == 60.0
+    
+    def test_tick_with_exact_expiration_time(self, powerup_system):
+        """Tick with exact remaining time should expire the power-up."""
+        powerup = powerup_system.grant_powerup(PowerUpType.STAR, Theme.MARIO)  # 30 seconds
+        powerup_system.activate_powerup(powerup.id)
+        
+        expired = powerup_system.tick(30.0)  # Exactly 30 seconds
+        
+        assert len(expired) == 1
+        assert len(powerup_system.get_active_powerups()) == 0
+    
+    def test_grant_powerup_for_all_themes(self, powerup_system):
+        """Should be able to grant power-ups for all themes."""
+        # Grant one power-up for each theme
+        mario_powerup = powerup_system.grant_powerup(PowerUpType.MUSHROOM, Theme.MARIO)
+        zelda_powerup = powerup_system.grant_powerup(PowerUpType.HEART_CONTAINER, Theme.ZELDA)
+        dkc_powerup = powerup_system.grant_powerup(PowerUpType.BANANA, Theme.DKC)
+        
+        inventory = powerup_system.get_inventory()
+        assert len(inventory) == 3
+        
+        themes = {p.theme for p in inventory}
+        assert Theme.MARIO in themes
+        assert Theme.ZELDA in themes
+        assert Theme.DKC in themes
+    
+    def test_multiple_activations_of_same_type(self, powerup_system):
+        """Should be able to activate multiple power-ups of the same type."""
+        # Grant 3 fire flowers
+        powerup = powerup_system.grant_powerup(PowerUpType.FIRE_FLOWER, Theme.MARIO)
+        powerup_system.grant_powerup(PowerUpType.FIRE_FLOWER, Theme.MARIO)
+        powerup_system.grant_powerup(PowerUpType.FIRE_FLOWER, Theme.MARIO)
+        
+        # Activate all 3
+        powerup_system.activate_powerup(powerup.id)
+        powerup_system.activate_powerup(powerup.id)
+        powerup_system.activate_powerup(powerup.id)
+        
+        # Should have 3 active power-ups
+        active = powerup_system.get_active_powerups()
+        assert len(active) == 3
+        
+        # Inventory should be empty
+        inventory = powerup_system.get_inventory()
+        assert len(inventory) == 0
+    
+    def test_tick_with_small_delta_time(self, powerup_system):
+        """Tick with very small delta time should work correctly."""
+        powerup = powerup_system.grant_powerup(PowerUpType.FIRE_FLOWER, Theme.MARIO)
+        powerup_system.activate_powerup(powerup.id)
+        
+        # Simulate many small ticks
+        for _ in range(100):
+            powerup_system.tick(0.1)
+        
+        active = powerup_system.get_active_powerups()
+        assert len(active) == 1
+        # 60 - (100 * 0.1) = 50 seconds remaining
+        assert abs(active[0].remaining_seconds - 50.0) < 0.01
+    
+    def test_powerup_with_unknown_type_uses_default_metadata(self, powerup_system):
+        """Power-ups with unknown types should use default metadata."""
+        # Use a power-up type that's not in POWERUP_METADATA
+        powerup = powerup_system.grant_powerup(PowerUpType.CAPE_FEATHER, Theme.MARIO)
+        
+        assert powerup.name == "Cape Feather"
+        assert "cape_feather" in powerup.description.lower()
+        assert powerup.icon == "cape_feather.png"
+    
+    def test_active_powerup_remaining_time_persists(self, temp_db):
+        """Remaining time on active power-ups should persist correctly."""
+        system1 = PowerUpSystem(temp_db)
+        powerup = system1.grant_powerup(PowerUpType.FIRE_FLOWER, Theme.MARIO)
+        system1.activate_powerup(powerup.id)
+        system1.tick(25.0)  # 35 seconds remaining
+        
+        system2 = PowerUpSystem(temp_db)
+        active = system2.get_active_powerups()
+        
+        assert len(active) == 1
+        assert abs(active[0].remaining_seconds - 35.0) < 0.01

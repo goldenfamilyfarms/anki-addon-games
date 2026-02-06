@@ -1,0 +1,23 @@
+{
+    "name": "NintendAnki",
+    "package": "nintendanki",
+    "version": "1.0.0",
+    "author": "NintendAnki Team",
+    "description": "A gamification add-on for Anki that transforms the study experience into a Nintendo-inspired gaming adventure with three selectable themes: Mario, Zelda, and DKC (Donkey Kong Country).",
+    "homepage": "https://github.com/nintendanki/nintendanki",
+    "conflicts": [],
+    "min_point_version": 50,
+    "max_point_version": null,
+    "mod": 0,
+    "ankiweb_id": "",
+    "tags": [
+        "gamification",
+        "motivation",
+        "games",
+        "nintendo",
+        "mario",
+        "zelda",
+        "donkey-kong"
+    ],
+    "license": "MIT"
+}
